@@ -7,6 +7,6 @@ import com.ecom.userservice.dto.UserResponseDto;
 
 public interface UserService {
 	UserResponseDto register(UserCreateRequestDto dto);
-	LoginResponseDto login(LoginRequestDto	 email);
+	LoginResponseDto login(LoginRequestDto email);
 	UserResponseDto getById(Long id);
 }
