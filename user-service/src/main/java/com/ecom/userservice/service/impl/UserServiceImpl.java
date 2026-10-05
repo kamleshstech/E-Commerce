@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public UserResponseDto register(UserCreateRequestDto dto) {
-		if(userRepository.existByEmail(dto.getEmail())) { 
+		if(userRepository.existsByEmail(dto.getEmail())) { 
 			throw new ResourceAlreadyExistException("duplicate Email!! Please provide unique email"); 
 		}
 		User user = userMapper.toEntity(dto);
