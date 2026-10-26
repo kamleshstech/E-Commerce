@@ -1,4 +1,4 @@
-package com.ecom.gateway.util;
+package com.ecom.gateway.security;
 
 import javax.crypto.SecretKey;
 
