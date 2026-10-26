@@ -29,8 +29,7 @@ public class JwtGateFilter implements GatewayFilter, Ordered{
 	private static final List<String> PUBLIC_URLS = List.of("/api/users/register","/api/users/login");
 	@Override
 	public int getOrder() {
-		// TODO Auto-generated method stub
-		return 0;
+		return -1;  //-1 higest priority, 1 medium, anyOther value is lowest
 	}
 
 	@Override
