@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.ecom.order.client.InventoryFeignClient;
+import com.ecom.order.dto.InventoryResponse;
 import com.ecom.order.dto.OrderRequest;
 import com.ecom.order.dto.OrderResponse;
 import com.ecom.order.entity.Order;
@@ -19,9 +21,14 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService{
 	private final OrderRepository orderRepo;
 	private final OrderMapper orderMapper;
+	private final InventoryFeignClient inventoryFeignClient;
 	
 	@Override
 	public OrderResponse placeOrder(OrderRequest request) {
+		InventoryResponse inventory = inventoryFeignClient.isInStock(request.getSkuCode());
+		if(!inventory.isInStock()) {
+			throw new RuntimeException("product is out of stock");
+		}
 		Order order = orderMapper.toEntity(request);
 		order.setOrderNumber(UUID.randomUUID().toString());
 		order.setOrderStatus(OrderStatus.CREATED);
