@@ -16,6 +16,6 @@ public class OrderEventConsumer {
 	
 	@KafkaListener(topics = "order-event", groupId = "inventory-group")
 	public void consume(OrderPlacedEvent event) {
-		
+		inventoryService.updateStock(event);
 	}
 }
