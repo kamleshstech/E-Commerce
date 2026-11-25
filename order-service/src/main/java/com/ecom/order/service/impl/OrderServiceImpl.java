@@ -1,5 +1,6 @@
 package com.ecom.order.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,8 @@ import com.ecom.order.dto.InventoryResponse;
 import com.ecom.order.dto.OrderRequest;
 import com.ecom.order.dto.OrderResponse;
 import com.ecom.order.entity.Order;
+import com.ecom.order.event.OrderPlacedEvent;
+import com.ecom.order.kafka.OrderEventProducer;
 import com.ecom.order.mapper.OrderMapper;
 import com.ecom.order.repo.OrderRepository;
 import com.ecom.order.service.OrderService;
@@ -22,6 +25,7 @@ public class OrderServiceImpl implements OrderService{
 	private final OrderRepository orderRepo;
 	private final OrderMapper orderMapper;
 	private final InventoryFeignClient inventoryFeignClient;
+	private final OrderEventProducer orderEventProducer;
 	
 	@Override
 	public OrderResponse placeOrder(OrderRequest request) {
@@ -30,9 +34,20 @@ public class OrderServiceImpl implements OrderService{
 			throw new RuntimeException("product is out of stock");
 		}
 		Order order = orderMapper.toEntity(request);
-		order.setOrderNumber(UUID.randomUUID().toString());
+		String orderId = UUID.randomUUID().toString();
+		order.setOrderNumber(orderId); 
 		order.setOrderStatus(OrderStatus.CREATED);
+		
 		Order savedOrder = orderRepo.save(order);
+		
+		OrderPlacedEvent event = new OrderPlacedEvent();
+		event.setEventId(UUID.randomUUID().toString());
+		event.setOrderId(orderId);
+		event.setSkuCode(request.getSkuCode());
+		event.setQunatity(request.getQuantity());
+		event.setEventTime(LocalDateTime.now());
+		
+		orderEventProducer.sendOrderEvent(event); 
 		
 		return orderMapper.toResponse(savedOrder);  
 	}

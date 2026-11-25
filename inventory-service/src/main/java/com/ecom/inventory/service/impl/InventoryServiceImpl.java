@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.ecom.inventory.dto.InventoryRequest;
 import com.ecom.inventory.dto.InventoryResponse;
 import com.ecom.inventory.entity.Inventory;
+import com.ecom.inventory.event.OrderPlacedEvent;
 import com.ecom.inventory.exception.InventoryNotFoundException;
 import com.ecom.inventory.mapper.InventoryMapper;
 import com.ecom.inventory.repo.InventoryRepository;
@@ -31,5 +32,19 @@ public class InventoryServiceImpl implements InventoryService{
 			.orElseThrow(() -> new InventoryNotFoundException(skuCode));  
 		return mapper.toResponse(inventory); 
 	}
-	
+
+	@Override
+	public void updateStock(OrderPlacedEvent event) {
+		Inventory inventory = invRepo.findBySkuCode(event.getSkuCode())
+			.orElseThrow(() -> new InventoryNotFoundException(event.getSkuCode()));
+		
+		int availableQuantity = inventory.getQuantity();
+		int orderedQuantity = event.getQunatity();
+		
+		if(orderedQuantity > availableQuantity) {
+			throw new RuntimeException("insuficient stock for this skuCode "+event.getSkuCode());
+		}
+		inventory.setQuantity(availableQuantity-orderedQuantity); 
+		invRepo.save(inventory);
+	}
 }
