@@ -1,0 +1,21 @@
+spring:
+   kafka:
+     bootstrap-servers: localhost:9092
+     consumer:
+       group-id: inventory-group   
+       auto-offset-reset: earliest  
+       key-deserializer: org.apache.kafka.comman.serialization.StringDeserializer  
+       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer 
+       properties:
+         spring.json.trusted.packages: "*"  
+         
+         
+         
+         
+         
+          #broker address from here consumer read the message
+          #why imp is bcs same group's consumers can share load
+          #read the message from start of the topic. if we set=latest then only latest messages
+          #producer sent key using StringSerializer to kafka, Consumer needs to convert back key into String using StringDeserializer from kafka
+          # convert json data into java object from kafka
+          # tells to jsonDeserializer which packages are allowed to deserialize

@@ -1,0 +1,6 @@
+spring: 
+  kafka: 
+    bootstrap-servers: 9092
+    producer: 
+       key-serializer: org.appache.kafka.comman.serialization.StringSerializer
+       value-serializer: org.apache.kafka.comman.serialization.JdsonSerializer 
